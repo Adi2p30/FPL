@@ -1,0 +1,7 @@
+https://towardsdatascience.com/using-apis-google-sheets-to-assess-fantasy-premier-league-prospects-1a2598c4b25e
+https://www.api-football.com/
+https://www.football-data.org/
+https://www.sportmonks.com/football-api/
+https://www.thesportsdb.com/
+https://github.com/n0shake/Public-APIs#sport
+https://github.com/public-apis/public-apis#sports--fitness
