@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { getAllPlayers, type Player } from '@/lib/api'
 import { getAllEnhancedMetrics, downloadTeamJSON, type SavedTeam } from '@/lib/enhanced-api'
+import AIAssistant from '@/components/AIAssistant'
 
 export default function DashboardPage() {
   const [players, setPlayers] = useState<any[]>([])
@@ -418,6 +419,22 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* AI Assistant */}
+      <AIAssistant context={{
+        team: myTeamPlayers.map(p => ({
+          id: p.id,
+          name: p.web_name,
+          position: p.element_type,
+          cost: p.now_cost / 10,
+          points: p.total_points
+        })),
+        budget_remaining: budget - teamCost,
+        selected_players: selectedPlayers.map(id =>
+          players.find(p => p.id === id)?.web_name
+        ).filter(Boolean),
+        current_gameweek: 1
+      }} />
     </div>
   )
 }

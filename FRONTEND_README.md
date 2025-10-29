@@ -6,6 +6,7 @@
 - **Styling**: Tailwind CSS with EA FC game theme
 - **Backend**: FastAPI (Python)
 - **API**: FPL Official API
+- **AI Assistant**: Google Gemini Pro LLM
 
 ## 🎨 Design Theme
 
@@ -59,11 +60,19 @@ npm install
 
 ### 2. Environment Variables
 
-Create `.env.local`:
+**Frontend** - Create `frontend/.env.local`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
+
+**Backend** - Create `backend/.env`:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+Get your Gemini API key from: https://makersuite.google.com/app/apikey
 
 ### 3. Run Development Server
 
@@ -104,6 +113,14 @@ Pre-loaded teams:
 - Radar charts with EA FC style
 - Position-specific metrics
 - xG/xA analysis
+
+### 5. AI Assistant (Gemini-Powered)
+- Collapsible chat interface (bottom-right)
+- Context-aware responses about your team
+- Understands all 30+ metrics
+- Can explain features and strategies
+- Quick action buttons for common queries
+- Team analysis and transfer suggestions
 
 ## 🎨 UI Components
 
@@ -176,13 +193,27 @@ const famousTeams = await getFamousTeams();
 - `GET /api/metrics/captains` - Captain picks
 - `GET /api/metrics/differentials` - Low-owned gems
 
+**AI Assistant**:
+- `POST /api/ai/chat` - Chat with AI assistant
+- `GET /api/ai/help/{page}` - Get page-specific help
+- `POST /api/ai/analyze-team` - Analyze team composition
+- `POST /api/ai/transfer-suggestions` - Get transfer recommendations
+- `GET /api/ai/explain-metric/{metric}` - Explain specific metrics
+- `POST /api/ai/reset` - Reset chat history
+
 ## 💻 Development
 
 ### Running Backend
 
 ```bash
 cd backend
-pip install fastapi uvicorn
+pip install -r requirements.txt
+# OR manually:
+# pip install fastapi uvicorn requests pandas numpy google-generativeai
+
+# Create .env file with your Gemini API key
+# GEMINI_API_KEY=your_key_here
+
 uvicorn main:app --reload
 ```
 
@@ -350,11 +381,14 @@ Edit `globals.css`:
 
 ✅ **Team Import**: By ID or URL
 ✅ **Famous Teams**: 8 YouTubers pre-loaded
-✅ **Team Editor**: Real-time editing
+✅ **Team Editor**: Real-time editing with save/load
+✅ **30+ Metrics**: PPM, xGI, form ratings, buy/sell scores
+✅ **Player Comparison**: Multi-select side-by-side comparison
+✅ **AI Assistant**: Gemini-powered chat for help and analysis
 ✅ **EA FC Style**: Dark mode, pink/purple theme
 ✅ **Small Buttons**: Subtle, not rounded
 ✅ **Smooth Animations**: Game-like feel
 ✅ **Live Data**: FPL API integration
 ✅ **Backend API**: FastAPI with Python
 
-Enjoy your EA FC-styled FPL dashboard! ⚽🎮
+Enjoy your EA FC-styled FPL dashboard with AI assistant! ⚽🎮🤖

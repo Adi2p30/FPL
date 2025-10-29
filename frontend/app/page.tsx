@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { getAllPlayers, getFamousManagers, importTeam, type Player, type FamousManager, type TeamData } from '@/lib/api'
+import AIAssistant from '@/components/AIAssistant'
 
 export default function Home() {
   const [players, setPlayers] = useState<Player[]>([])
@@ -366,6 +367,22 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* AI Assistant */}
+      <AIAssistant context={{
+        team: importedTeam?.picks?.picks.slice(0, 11).map(pick => {
+          const player = players.find(p => p.id === pick.element)
+          return player ? {
+            id: player.id,
+            name: player.web_name,
+            position: player.element_type,
+            cost: player.now_cost / 10,
+            points: player.total_points
+          } : null
+        }).filter(Boolean) || [],
+        selected_players: [],
+        current_gameweek: importedTeam?.gameweek || 1
+      }} />
     </main>
   )
 }

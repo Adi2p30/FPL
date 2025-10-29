@@ -19,6 +19,7 @@ from Fpl_api import FPLapi_main_endpoint, players as get_players, teamdata
 from advanced_metrics import AdvancedMetrics
 from fpl_team_api import FPLTeamAPI, FAMOUS_MANAGERS
 from enhanced_metrics import EnhancedMetrics, METRIC_DESCRIPTIONS
+from fpl_ai_assistant import ai_assistant
 
 app = FastAPI(title="FPL Analytics API", version="1.0.0")
 
@@ -47,6 +48,11 @@ class PlayerUpdateRequest(BaseModel):
     player_in_id: int
     player_out_id: int
     gameweek: int
+
+
+class AIAssistantRequest(BaseModel):
+    message: str
+    context: Optional[Dict] = None
 
 
 # ============================================================================
@@ -509,6 +515,92 @@ async def get_metric_descriptions():
         "success": True,
         "descriptions": METRIC_DESCRIPTIONS
     }
+
+
+# ============================================================================
+# AI ASSISTANT ENDPOINTS
+# ============================================================================
+
+@app.post("/api/ai/chat")
+async def ai_chat(request: AIAssistantRequest):
+    """Chat with AI assistant"""
+    try:
+        response = ai_assistant.get_response(request.message, request.context)
+        return {
+            "success": True,
+            "response": response
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/ai/help/{page}")
+async def ai_get_page_help(page: str):
+    """Get AI help for specific page"""
+    try:
+        help_text = ai_assistant.get_contextual_help(page)
+        return {
+            "success": True,
+            "help": help_text
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ai/analyze-team")
+async def ai_analyze_team(team_players: List[Dict]):
+    """Get AI analysis of team"""
+    try:
+        analysis = ai_assistant.analyze_team(team_players)
+        return {
+            "success": True,
+            "analysis": analysis
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ai/transfer-suggestions")
+async def ai_transfer_suggestions(
+    current_player: str,
+    budget: float,
+    position: str
+):
+    """Get AI transfer suggestions"""
+    try:
+        suggestions = ai_assistant.suggest_transfers(current_player, budget, position)
+        return {
+            "success": True,
+            "suggestions": suggestions
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/ai/explain-metric/{metric_name}")
+async def ai_explain_metric(metric_name: str):
+    """Get AI explanation of metric"""
+    try:
+        explanation = ai_assistant.explain_metric(metric_name)
+        return {
+            "success": True,
+            "explanation": explanation
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ai/reset")
+async def ai_reset_chat():
+    """Reset AI chat history"""
+    try:
+        ai_assistant.reset_chat()
+        return {
+            "success": True,
+            "message": "Chat history reset"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
