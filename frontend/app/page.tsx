@@ -116,9 +116,12 @@ export default function Home() {
               >
                 Compare
               </button>
+              <a href="/dashboard" className="btn btn-secondary btn-sm ml-4">
+                📊 Dashboard
+              </a>
               <button
                 onClick={() => setImportModalOpen(true)}
-                className="btn btn-primary btn-sm ml-4"
+                className="btn btn-primary btn-sm"
               >
                 Import Team
               </button>

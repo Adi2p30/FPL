@@ -18,6 +18,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from Fpl_api import FPLapi_main_endpoint, players as get_players, teamdata
 from advanced_metrics import AdvancedMetrics
 from fpl_team_api import FPLTeamAPI, FAMOUS_MANAGERS
+from enhanced_metrics import EnhancedMetrics, METRIC_DESCRIPTIONS
 
 app = FastAPI(title="FPL Analytics API", version="1.0.0")
 
@@ -392,6 +393,122 @@ async def root():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+
+# ============================================================================
+# ENHANCED METRICS ENDPOINTS
+# ============================================================================
+
+@app.get("/api/enhanced/all-metrics")
+async def get_all_enhanced_metrics():
+    """Get all players with enhanced metrics"""
+    try:
+        fpl_data = FPLapi_main_endpoint()
+        players_df = get_players(fpl_data)
+
+        enhanced = EnhancedMetrics(players_df)
+        all_metrics = enhanced.calculate_all_metrics()
+
+        return {
+            "success": True,
+            "count": len(all_metrics),
+            "metrics": all_metrics.to_dict('records')
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/enhanced/top-picks")
+async def get_enhanced_top_picks(
+    position: Optional[int] = None,
+    n: int = 20
+):
+    """Get top picks by overall score"""
+    try:
+        fpl_data = FPLapi_main_endpoint()
+        players_df = get_players(fpl_data)
+
+        enhanced = EnhancedMetrics(players_df)
+        top_picks = enhanced.get_top_picks(position, n)
+
+        return {
+            "success": True,
+            "top_picks": top_picks.to_dict('records')
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/enhanced/transfers-in")
+async def get_enhanced_transfers_in(
+    max_cost: float = 15.0,
+    position: Optional[int] = None,
+    n: int = 20
+):
+    """Get best transfer IN targets"""
+    try:
+        fpl_data = FPLapi_main_endpoint()
+        players_df = get_players(fpl_data)
+
+        enhanced = EnhancedMetrics(players_df)
+        transfers = enhanced.get_transfers_in(max_cost, position, n)
+
+        return {
+            "success": True,
+            "transfers_in": transfers.to_dict('records')
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/enhanced/differentials")
+async def get_enhanced_differentials(
+    max_ownership: float = 10.0,
+    min_points: int = 30,
+    n: int = 20
+):
+    """Get differential players with enhanced scoring"""
+    try:
+        fpl_data = FPLapi_main_endpoint()
+        players_df = get_players(fpl_data)
+
+        enhanced = EnhancedMetrics(players_df)
+        differentials = enhanced.get_differentials(max_ownership, min_points, n)
+
+        return {
+            "success": True,
+            "differentials": differentials.to_dict('records')
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/enhanced/compare")
+async def compare_players_enhanced(player_ids: List[int]):
+    """Compare multiple players with all enhanced metrics"""
+    try:
+        fpl_data = FPLapi_main_endpoint()
+        players_df = get_players(fpl_data)
+
+        enhanced = EnhancedMetrics(players_df)
+        comparison = enhanced.compare_players(player_ids)
+
+        return {
+            "success": True,
+            "comparison": comparison.to_dict('records'),
+            "metric_descriptions": METRIC_DESCRIPTIONS
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/enhanced/metric-descriptions")
+async def get_metric_descriptions():
+    """Get descriptions for all enhanced metrics"""
+    return {
+        "success": True,
+        "descriptions": METRIC_DESCRIPTIONS
+    }
 
 
 if __name__ == "__main__":
